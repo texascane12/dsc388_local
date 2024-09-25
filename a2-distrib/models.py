@@ -105,7 +105,7 @@ class DAN(nn.Module):
         self.g = nn.ReLU()
         self.W = nn.Linear(n_hidden_units, n_classes)
         self._softmax = nn.Softmax(dim=1)
-        self.word_embedding=WordEmbeddings
+        self.word_embedding=word_embedding
         
     def average(self, x):
         avg_emb = x.sum(axis=0, keepdims=True)
@@ -120,7 +120,7 @@ class DAN(nn.Module):
         word_vec_list = []
         for word in ex_words: 
             word = word.lower() 
-            word_vec = form_input(word_embedding.get_embedding(word))
+            word_vec = form_input(self.word_embedding.get_embedding(word))
             word_vec_list.append(word_vec)
         x=torch.stack(word_vec_list)
         log_probs = self.forward(x)
