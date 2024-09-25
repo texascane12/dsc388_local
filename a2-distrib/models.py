@@ -249,7 +249,7 @@ def train_deep_averaging_network(args, train_exs: List[SentimentExample], dev_ex
     embedding_size = word_embeddings.vectors[0].shape[0] 
     num_classes = 2
     num_hidden_units = 10
-    dan = DAN(n_classes = num_classes, n_hidden_units = num_hidden_units , vocab_size = vocab_size,emb_dim=embedding_size)
+    dan = DAN(n_classes = num_classes, n_hidden_units = num_hidden_units ,word_embeddings, vocab_size = vocab_size,emb_dim=embedding_size)
     initial_learning_rate=0.001
     optimizer = optim.Adam(dan.parameters(), lr=initial_learning_rate)
     
