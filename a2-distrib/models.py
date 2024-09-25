@@ -94,7 +94,7 @@ class NeuralSentimentClassifier(SentimentClassifier):
 
 # Create a Deep Averaging network model class
 class DAN(nn.Module):
-    def __init__(self, n_classes, n_hidden_units, vocab_size, emb_dim=300):
+    def __init__(self, n_classes, n_hidden_units, vocab_size, word_embeddings : WordEmbeddings ,emb_dim=300):
         super(DAN, self).__init__()
   #      self.classifier = NeuralSentimentClassifier()
         self.n_classes = n_classes
@@ -105,7 +105,7 @@ class DAN(nn.Module):
         self.g = nn.ReLU()
         self.W = nn.Linear(n_hidden_units, n_classes)
         self._softmax = nn.Softmax(dim=1)
-  #      self.word_embedding=word_embedding
+        self.word_embedding=word_embedding
         
     def average(self, x):
         avg_emb = x.sum(axis=0, keepdims=True)
@@ -120,7 +120,7 @@ class DAN(nn.Module):
         word_vec_list = []
         for word in ex_words: 
             word = word.lower() 
-            word_vec = form_input(WordEmbeddings.get_embedding(word))
+            word_vec = form_input(self.word_embedding.get_embedding(word))
             word_vec_list.append(word_vec)
         x=torch.stack(word_vec_list)
         log_probs = self.forward(x)
