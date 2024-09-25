@@ -54,14 +54,14 @@ class TrivialSentimentClassifier(SentimentClassifier):
         """
         return 1
 
-def spelling_correction(document):
+def spelling_correction(document,word_index):
     corrected_document = []
     for i in range(0,len(document)):
         incorrect_words = document[i] 
         corrected_sentence = [] 
         for word in incorrect_words: 
             word = word.lower()
-            if len(word) >3 and words_embedder.contains(word) == False:
+            if len(word) >3 and word_index.contains(word) == False:
                 temp = [(jaccard_distance(set(ngrams(word, 2)), 
                                           set(ngrams(w, 2))),w) for w in correct_words if w[0]==word[0]] 
                 if len(temp) > 0:
@@ -291,13 +291,14 @@ def train_deep_averaging_network(args, train_exs: List[SentimentExample], dev_ex
         print("Total loss on epoch %i: %f" % (epoch, total_loss))
     dan.eval()
     if train_model_for_typo_setting == True :
+        words_embedder_ind=word_embeddings.word_indexer 
         labels_dev = []
         sentence_typos = []
         for i in range(0,len(dev_exs)):
             labels_dev.append(dev_exs[i].label)
             sentence_typos.append(dev_exs[i].words)
             
-        sentence_dev = spelling_correction(sentence_typos)
+        sentence_dev = spelling_correction(sentence_typos,words_embedder_ind)
 
     else:
         labels_dev = []
