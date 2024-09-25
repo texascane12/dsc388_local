@@ -244,6 +244,18 @@ def train_deep_averaging_network(args, train_exs: List[SentimentExample], dev_ex
             word_vec_list.append(word_vec)
         document.append((torch.stack(word_vec_list), torch.tensor(target)))
 
+
+    document_dev = []
+    for i in range(0,len(dev_exs)):
+        target = labels_dev[i]
+        words = sentence_dev[i] 
+        word_vec_list = [] 
+        for word in words: 
+            word = word.lower() 
+            word_vec = form_input(word_embeddings.get_embedding(word))
+            word_vec_list.append(word_vec)
+        document_dev.append((torch.stack(word_vec_list), torch.tensor(target)))
+
     #document_batches=create_batch(document)
     # Define some constants
     embedding_size = word_embeddings.vectors[0].shape[0] 
@@ -271,6 +283,22 @@ def train_deep_averaging_network(args, train_exs: List[SentimentExample], dev_ex
             optimizer.step()
         print("Total loss on epoch %i: %f" % (epoch, total_loss))
     dan.eval()
+    
+    for epoch in range(0, num_epochs):
+        total_loss = 0.0
+        for sentence,label in document_dev:
+            x = sentence
+            y = label 
+            y_onehot = torch.zeros(num_classes)
+            y_onehot.scatter_(0, torch.from_numpy(np.asarray(y,dtype=np.int64)), 1)
+            dan.zero_grad()
+            log_probs = dan.forward(x)
+            loss = criterion(log_probs.view(num_classes),y_onehot) 
+            total_loss += loss 
+            loss.backward()
+            optimizer.step()
+        print("Total loss on epoch %i: %f" % (epoch, total_loss))
+    
     classifier = NeuralSentimentClassifier(dan)
     return classifier
 
