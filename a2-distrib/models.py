@@ -118,12 +118,10 @@ class DAN(nn.Module):
         return self._softmax(self.W(self.g(self.V(avg))))
 
     def predict(self,  ex_words: List[str], has_typos: bool) -> int:            
-        embs_path=args.word_vecs_path
-        embs = read_word_embeddings(embs_path)
         word_vec_list = []
         for word in ex_words: 
             word = word.lower() 
-            word_vec = form_input(embs.get_embedding(word))
+            word_vec = form_input(word_embeddings.get_embedding(word))
             word_vec_list.append(word_vec)
         x=torch.stack(word_vec_list)
         log_probs = self.forward(x)
