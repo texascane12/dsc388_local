@@ -105,7 +105,7 @@ class DAN(nn.Module):
         self.g = nn.ReLU()
         self.W = nn.Linear(n_hidden_units, n_classes)
         self._softmax = nn.Softmax(dim=1)
-        self.word_embedding=word_embedding
+  #      self.word_embedding=word_embedding
         
     def average(self, x):
         avg_emb = x.sum(axis=0, keepdims=True)
