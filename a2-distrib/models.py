@@ -253,7 +253,7 @@ def train_deep_averaging_network(args, train_exs: List[SentimentExample], dev_ex
     initial_learning_rate=0.001
     optimizer = optim.Adam(dan.parameters(), lr=initial_learning_rate)
     
-    num_epochs = 4
+    num_epochs = 40
     criterion = nn.CrossEntropyLoss()
     dan.train()
     for epoch in range(0, num_epochs):
