@@ -146,6 +146,7 @@ class DAN_Batch(nn.Module):
         self.n_hidden_units = n_hidden_units
         self.V = nn.Linear(emb_dim_t, n_hidden_units_t)
         self.g = nn.ReLU()
+        self.dropout = nn.Dropout(p=0.5)  # Dropout layer with 50% probability
         self.W = nn.Linear(n_hidden_units_t, n_classes_t)
 
         self.log_softmax = nn.LogSoftmax(dim=None)
@@ -163,7 +164,7 @@ class DAN_Batch(nn.Module):
     def forward(self, x):
         avg = self.average(x,z)
 #        return self.log_softmax(self.classifier(avg))
-        return self.log_softmax(self.W(self.g(self.V(avg))))
+        return self.log_softmax(self.W(self.dropout(self.g(self.V(avg)))))
 #        return self._softmax(self.W(self.g(self.V(avg))))        
 
 # Creating our dataset class
