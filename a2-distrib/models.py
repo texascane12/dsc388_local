@@ -15,6 +15,7 @@ nltk.download('words')
 from nltk.corpus import words 
 from nltk.metrics.distance  import edit_distance 
 correct_words = words.words()
+from nltk.metrics.distance import jaccard_distance 
 
 
 class SentimentClassifier(object):
@@ -53,16 +54,23 @@ class TrivialSentimentClassifier(SentimentClassifier):
         """
         return 1
 
-def spelling_correction(incorrect_words):
-    corrected_words_list = []
-    for i in range(0,len(incorrect_words)):
-        words = incorrect_words[i] 
-        word_vec_list = [] 
-        for word in words: 
-            temp = [(edit_distance(word, w),w) for w in correct_words if w[0]==word[0]] 
-            word_vec_list.append(temp)
-        corrected_words_list.append(word_vec_list)
-    return corrected_words_list
+def spelling_correction(document):
+    corrected_document = []
+    for i in range(0,len(document)):
+        incorrect_words = document[i] 
+        corrected_sentence = [] 
+        for word in incorrect_words: 
+            word = word.lower()
+            if len(word) >3 and words_embedder.contains(word) == False:
+                temp = [(jaccard_distance(set(ngrams(word, 2)), 
+                                          set(ngrams(w, 2))),w) for w in correct_words if w[0]==word[0]] 
+                if len(temp) > 0:
+                    cor_word=(sorted(temp, key = lambda val:val[0])[0][1])
+                    corrected_sentence.append(cor_word)   
+            else:
+                corrected_sentence.append(word)
+        corrected_document.append(corrected_sentence)
+    return corrected_document
 
 class NeuralSentimentClassifier(SentimentClassifier):
     """
@@ -214,7 +222,6 @@ def train_deep_averaging_network(args, train_exs: List[SentimentExample], dev_ex
     for the two settings.
     """
 
-    
     labels_dev = []
     sentence_dev = []
     for i in range(0,len(dev_exs)):
@@ -260,7 +267,7 @@ def train_deep_averaging_network(args, train_exs: List[SentimentExample], dev_ex
     # Define some constants
     embedding_size = word_embeddings.vectors[0].shape[0] 
     num_classes = 2
-    num_hidden_units = 10
+    num_hidden_units = 100
     dan = DAN(n_classes = num_classes, n_hidden_units = num_hidden_units ,word_embeddings=word_embeddings, vocab_size = vocab_size,emb_dim=embedding_size)
     initial_learning_rate=0.001
     optimizer = optim.Adam(dan.parameters(), lr=initial_learning_rate)
@@ -283,7 +290,22 @@ def train_deep_averaging_network(args, train_exs: List[SentimentExample], dev_ex
             optimizer.step()
         print("Total loss on epoch %i: %f" % (epoch, total_loss))
     dan.eval()
-    
+    if train_model_for_typo_setting == True :
+        labels_dev = []
+        sentence_typos = []
+        for i in range(0,len(dev_exs)):
+            labels_dev.append(dev_exs[i].label)
+            sentence_typos.append(dev_exs[i].words)
+            
+        sentence_dev = spelling_correction(sentence_typos)
+
+    else:
+        labels_dev = []
+        sentence_dev = []
+        for i in range(0,len(dev_exs)):
+            labels_dev.append(dev_exs[i].label)
+            sentence_dev.append(dev_exs[i].words)
+        
     for epoch in range(0, num_epochs):
         total_loss = 0.0
         for sentence,label in document_dev:
