@@ -11,7 +11,7 @@ import torch.nn.functional as F
 from torch.utils.data import DataLoader
 from torch.utils.data import Dataset
 from nltk.util import ngrams
-#nltk.download('words') 
+nltk.download('words') 
 from nltk.corpus import words 
 from nltk.metrics.distance  import edit_distance 
 correct_words = words.words()
