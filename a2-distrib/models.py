@@ -87,7 +87,6 @@ class NeuralSentimentClassifier(SentimentClassifier):
         return [self.predict(ex_words, has_typos) for ex_words in all_ex_words]
         
     def predict(self, ex_words: List[str], has_typos: bool) -> int:
-        
         # Change to predict 
         prediction = self.model.predict(ex_words, has_typos= bool)
         return prediction
@@ -121,7 +120,7 @@ class DAN(nn.Module):
         word_vec_list = []
         for word in ex_words: 
             word = word.lower() 
-            word_vec = form_input(self.word_embedding.get_embedding(word))
+            word_vec = form_input(word_embedding.get_embedding(word))
             word_vec_list.append(word_vec)
         x=torch.stack(word_vec_list)
         log_probs = self.forward(x)
@@ -273,6 +272,5 @@ def train_deep_averaging_network(args, train_exs: List[SentimentExample], dev_ex
         print("Total loss on epoch %i: %f" % (epoch, total_loss))
     dan.eval()
     classifier = NeuralSentimentClassifier(dan)
-    
     return classifier
 
