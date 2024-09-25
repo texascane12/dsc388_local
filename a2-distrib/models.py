@@ -121,7 +121,7 @@ class DAN(nn.Module):
         word_vec_list = []
         for word in ex_words: 
             word = word.lower() 
-            word_vec = form_input(word_embeddings.get_embedding(word))
+            word_vec = form_input(self.word_embedding.get_embedding(word))
             word_vec_list.append(word_vec)
         x=torch.stack(word_vec_list)
         log_probs = self.forward(x)
