@@ -94,7 +94,7 @@ class NeuralSentimentClassifier(SentimentClassifier):
 
 # Create a Deep Averaging network model class
 class DAN(nn.Module):
-    def __init__(self, n_classes, n_hidden_units, vocab_size, word_embeddings : WordEmbeddings ,emb_dim=300):
+    def __init__(self, n_classes, n_hidden_units, vocab_size, word_embeddings  ,emb_dim=300):
         super(DAN, self).__init__()
   #      self.classifier = NeuralSentimentClassifier()
         self.n_classes = n_classes
